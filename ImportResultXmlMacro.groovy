@@ -32,7 +32,6 @@ import org.openoffice.guno.UnoExtension
 
 import com.sun.star.sheet.XSpreadsheet
 import com.sun.star.sheet.XSpreadsheetDocument
-import com.sun.star.sheet.XSpreadsheets
 import com.sun.star.sheet.XSpreadsheetView
 import com.sun.star.sheet.XViewFreezable
 
@@ -80,11 +79,10 @@ if (openXmlDialog.showOpenDialog() == JFileChooser.APPROVE_OPTION) {
     // get the document model from the scripting context which is made available to all scripts
     XModel xModel = XSCRIPTCONTEXT.getDocument()
     XSpreadsheetDocument doc = xModel.guno(XSpreadsheetDocument.class)
-    XSpreadsheets xSheets = doc.sheets
-    XSpreadsheet sht = doc.getSheetByName("Sheet1")
 
     XController xController = xModel.currentController
     xSpreadsheetView = xController.guno(XSpreadsheetView.class)
+    XSpreadsheet sht = xSpreadsheetView.getActiveSheet()
     xFreeze = xController.guno(XViewFreezable.class)
 
     // create the custom styles
@@ -144,7 +142,7 @@ if (openXmlDialog.showOpenDialog() == JFileChooser.APPROVE_OPTION) {
     def buildLangsProp = testsuite.properties.property.find { it.@name == 'info.app.AllLanguages' }
     String buildId = buildIdProp.@value + " " + buildLangsProp.@value
 
-    // info.app.Revision = b324a13c35 
+    // info.app.Revision = b324a13c35
     // full link = // https://github.com/apache/openoffice/commit/b324a13c35
     def buildRevProp = testsuite.properties.property.find { it.@name == 'info.app.Revision' }
     String buildRev = buildRevProp.@value
@@ -273,10 +271,10 @@ if (openXmlDialog.showOpenDialog() == JFileChooser.APPROVE_OPTION) {
         xCellRangePs = xCellRange.guno(XPropertySet.class)
         if (row % 2) {
             // evenRowPs
-            xCellRangePs["CellStyle"] =  "EvenRow"
+            xCellRangePs["CellStyle"] = "EvenRow"
         } else {
             // oddRowPs
-            xCellRangePs["CellStyle"] =  "OddRow"
+            xCellRangePs["CellStyle"] = "OddRow"
         }
         xCellRange = null
         xCellRangePs = null
