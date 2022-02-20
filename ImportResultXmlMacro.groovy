@@ -35,6 +35,11 @@ import com.sun.star.sheet.XSpreadsheetDocument
 import com.sun.star.sheet.XSpreadsheetView
 import com.sun.star.sheet.XViewFreezable
 
+import com.sun.star.sheet.XSheetFilterable
+import com.sun.star.sheet.XSheetFilterDescriptor 
+import com.sun.star.sheet.TableFilterField
+import com.sun.star.sheet.FilterOperator
+
 import com.sun.star.beans.XPropertySet
 import com.sun.star.table.*
 
@@ -403,6 +408,44 @@ if (openXmlDialog.showOpenDialog() == JFileChooser.APPROVE_OPTION) {
     xCellRangePs["CharUnderlineColor"] = BLUE
     xCellRange = null
     xCellRangePs = null
+
+
+    /* this section applies a standard filter for column 3 and 4 to only 
+     * show errors and failures
+     * comment out this section to not apply the filter.
+     * Note: filter can be removed by showing hidden rows.
+     */
+
+    // BEGIN FILTER
+
+    int lastRow = testCount + 9
+    xCellRange = sht.getCellRangeByName("A9:E${lastRow}")
+
+    XSheetFilterable xFilter = xCellRange.guno(XSheetFilterable.class)
+
+    XSheetFilterDescriptor xFilterDesc = xFilter.createFilterDescriptor(true)
+    TableFilterField[] aFilterFields = new TableFilterField[2]
+    aFilterFields[0] = new TableFilterField()
+    aFilterFields[0].Field = 2
+    aFilterFields[0].IsNumeric = false
+    aFilterFields[0].Operator = com.sun.star.sheet.FilterOperator.NOT_EQUAL
+    aFilterFields[0].StringValue = "No Error"
+
+    aFilterFields[1] = new TableFilterField()
+    aFilterFields[1].Connection = com.sun.star.sheet.FilterConnection.OR
+    aFilterFields[1].Field = 3
+    aFilterFields[1].IsNumeric = false
+    aFilterFields[1].Operator = com.sun.star.sheet.FilterOperator.NOT_EQUAL
+    aFilterFields[1].StringValue = "No Failure"
+
+    xFilterDesc.setFilterFields(aFilterFields)
+
+    XPropertySet xFilterProp = xFilterDesc.guno(XPropertySet.class)
+
+    xFilterProp.setPropertyValue("ContainsHeader", new Boolean(true))
+    xFilter.filter(xFilterDesc)
+    
+    // END FILTER
 
     println()
 
